@@ -1,0 +1,333 @@
+/*global beforeEach, describe, expect, it, jasmine, require*/
+
+(function () {
+    'use strict';
+
+    var Complexion;
+
+    Complexion = require('../');
+
+    describe('initialization', function () {
+        it('constructs with "new" keyword', function () {
+            var c;
+            c = new Complexion();
+            expect(c instanceof Complexion).toBe(true);
+        });
+        it('constructs without "new" keyword', function () {
+            var c, asFunction;
+
+            // Copy to a non-capitalized variable for jslint
+            asFunction = Complexion;
+            c = asFunction();
+            expect(c instanceof Complexion).toBe(true);
+        });
+    });
+    describe('Complexion.matchAny', function () {
+        var matcher;
+
+        beforeEach(function () {
+            matcher = Complexion.matchAny();
+        });
+        it('returns a character at the beginning', function () {
+            expect(matcher('abcd', 0)).toBe('a');
+        });
+        it('returns a character at the end', function () {
+            expect(matcher('abcd', 3)).toBe('d');
+        });
+        it('returns null if too far forward', function () {
+            expect(matcher('abcd', 4)).toBe(null);
+        });
+    });
+
+    function matchStringTest(methodName, isInsensitive) {
+        function addTestToFind(needle) {
+
+            function seeking(result, haystack, offset) {
+                describe('finding "' + needle + '" in "' + haystack + '" at ' + offset, function () {
+                    var insensitiveHaystack, insensitiveResult, matcher, matcherWithNext, spy;
+
+                    beforeEach(function () {
+                        matcher = Complexion[methodName](needle);
+                        spy = jasmine.createSpy('next matcher');
+                        matcherWithNext = Complexion[methodName](needle, spy);
+                        insensitiveHaystack = haystack.toUpperCase();
+
+                        if (!isInsensitive || !result) {
+                            insensitiveResult = null;
+                        } else if (result) {
+                            insensitiveResult = result.toUpperCase();
+                        }
+                    });
+                    it('passes the normal test', function () {
+                        expect(matcher(haystack, offset)).toBe(result);
+                    });
+                    it('passes the insensitive test', function () {
+                        expect(matcher(insensitiveHaystack, offset)).toBe(insensitiveResult);
+                    });
+                    it('chains to the next matcher, which fails', function () {
+                        spy.andReturn(null);
+                        expect(matcherWithNext(haystack, offset)).toBe(null);
+
+                        if (result) {
+                            expect(spy).toHaveBeenCalledWith(haystack, offset);
+                        } else {
+                            expect(spy).not.toHaveBeenCalled();
+                        }
+                    });
+                    it('chains to the next matcher, which returns "123"', function () {
+                        spy.andReturn("123");
+
+                        if (result) {
+                            expect(matcherWithNext(haystack, offset)).toBe("123");
+                            expect(spy).toHaveBeenCalledWith(haystack, offset);
+                        } else {
+                            expect(matcherWithNext(haystack, offset)).toBe(null);
+                            expect(spy).not.toHaveBeenCalled();
+                        }
+                    });
+                    it('insensitively chains to the next matcher, which fails', function () {
+                        spy.andReturn(null);
+                        expect(matcherWithNext(insensitiveHaystack, offset)).toBe(null);
+
+                        if (insensitiveResult) {
+                            expect(spy).toHaveBeenCalledWith(insensitiveHaystack, offset);
+                        } else {
+                            expect(spy).not.toHaveBeenCalled();
+                        }
+                    });
+                    it('insensitively chains to the next matcher, which returns "123"', function () {
+                        spy.andReturn("123");
+
+                        if (insensitiveResult) {
+                            expect(matcherWithNext(insensitiveHaystack, offset)).toBe("123");
+                            expect(spy).toHaveBeenCalledWith(insensitiveHaystack, offset);
+                        } else {
+                            expect(matcherWithNext(insensitiveHaystack, offset)).toBe(null);
+                            expect(spy).not.toHaveBeenCalled();
+                        }
+                    });
+                });
+            }
+
+            seeking(needle, needle + 'asdfasdf', 0);
+            seeking(needle, 'asdfasdf' + needle + 'asdfasdf', 8);
+            seeking(needle, 'asdfasdf' + needle, 8);
+            seeking(null, 'asdfasdf' + needle + 'asdfasdf', 7);
+            seeking(null, 'asdfasdf' + needle + 'asdfasdf', 9);
+        }
+
+        describe('Complexion.' + methodName, function () {
+            addTestToFind("g");
+            addTestToFind("kthx");
+        });
+    }
+
+    matchStringTest('matchString', false);
+    matchStringTest('matchStringInsensitive', true);
+    describe('Complexion.prototype.tokenize with no tokens', function () {
+        var complexion;
+
+        beforeEach(function () {
+            complexion = new Complexion();
+        });
+        it('returns an empty array from an empty string', function () {
+            expect(complexion.tokenize('')).toEqual([]);
+        });
+        it('throws if there is even a single character to tokenize', function () {
+            expect(function () {
+                complexion.tokenize('a');
+            }).toThrow();
+        });
+    });
+    describe('Complexion.prototype.tokenize with simple tokens', function () {
+        var complexion;
+
+        beforeEach(function () {
+            complexion = new Complexion();
+            complexion.defineToken('A', Complexion.matchString('a'));
+            complexion.defineToken('B', Complexion.matchString('b'));
+            complexion.defineToken('WS', function (str, offset) {
+                var c, l;
+
+                l = offset;
+                c = str.charAt(offset);
+
+                while (c === ' ' || c === '\t' || c === '\r' || c === '\n') {
+                    l += 1;
+                    c = str.charAt(l);
+                }
+
+                if (l - offset === 0) {
+                    return null;
+                }
+
+                return str.substr(offset, l - offset);
+            });
+        });
+        it('returns an empty array from an empty string', function () {
+            expect(complexion.tokenize('')).toEqual([]);
+        });
+        it('tokenizes a string of good tokens', function () {
+            expect(complexion.tokenize('aabbabab')).toEqual([
+                {
+                    line: 1,
+                    col: 1,
+                    offset: 0,
+                    type: 'A',
+                    content: 'a'
+                },
+                {
+                    line: 1,
+                    col: 2,
+                    offset: 1,
+                    type: 'A',
+                    content: 'a'
+                },
+                {
+                    line: 1,
+                    col: 3,
+                    offset: 2,
+                    type: 'B',
+                    content: 'b'
+                },
+                {
+                    line: 1,
+                    col: 4,
+                    offset: 3,
+                    type: 'B',
+                    content: 'b'
+                },
+                {
+                    line: 1,
+                    col: 5,
+                    offset: 4,
+                    type: 'A',
+                    content: 'a'
+                },
+                {
+                    line: 1,
+                    col: 6,
+                    offset: 5,
+                    type: 'B',
+                    content: 'b'
+                },
+                {
+                    line: 1,
+                    col: 7,
+                    offset: 6,
+                    type: 'A',
+                    content: 'a'
+                },
+                {
+                    line: 1,
+                    col: 8,
+                    offset: 7,
+                    type: 'B',
+                    content: 'b'
+                }
+            ]);
+        });
+        it('calculates whitespace correctly', function () {
+            expect(complexion.tokenize('a\nb\ra\r\nb\n\ra b\ta')).toEqual([
+                {
+                    line: 1,
+                    col: 1,
+                    offset: 0,
+                    type: 'A',
+                    content: 'a'
+                },
+                {
+                    line: 1,
+                    col: 2,
+                    offset: 1,
+                    type: 'WS',
+                    content: '\n'
+                },
+                {
+                    line: 2,
+                    col: 1,
+                    offset: 2,
+                    type: 'B',
+                    content: 'b'
+                },
+                {
+                    line: 2,
+                    col: 2,
+                    offset: 3,
+                    type: 'WS',
+                    content: '\r'
+                },
+                {
+                    line: 3,
+                    col: 1,
+                    offset: 4,
+                    type: 'A',
+                    content: 'a'
+                },
+                {
+                    line: 3,
+                    col: 2,
+                    offset: 5,
+                    type: 'WS',
+                    content: '\r\n'
+                },
+                {
+                    line: 4,
+                    col: 1,
+                    offset: 7,
+                    type: 'B',
+                    content: 'b'
+                },
+                {
+                    line: 4,
+                    col: 2,
+                    offset: 8,
+                    type: 'WS',
+                    content: '\n\r'
+                },
+                {
+                    line: 6,
+                    col: 1,
+                    offset: 10,
+                    type: 'A',
+                    content: 'a'
+                },
+                {
+                    line: 6,
+                    col: 2,
+                    offset: 11,
+                    type: 'WS',
+                    content: ' '
+                },
+                {
+                    line: 6,
+                    col: 3,
+                    offset: 12,
+                    type: 'B',
+                    content: 'b'
+                },
+                {
+                    line: 6,
+                    col: 4,
+                    offset: 13,
+                    type: 'WS',
+                    content: '\t'
+                },
+                {
+                    line: 6,
+                    col: 5,
+                    offset: 14,
+                    type: 'A',
+                    content: 'a'
+                }
+            ]);
+        });
+    });
+
+    // To test:
+    // defineToken(type, matcher)
+    // tokenize(str) can throw
+    // tokenize(str) returns an array with empty input
+    // tokenize(str) returns an array with tokens
+    // tokenize(str) returns an array of custom token types
+}());

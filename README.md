@@ -11,6 +11,10 @@ What Does This Do?
 
 This is the core of a tokenizing library.  It can be used to parse CSS, JavaScript, XML, JSON, English or any other sort of structured data.  It doesn't do it out of the box; you need to write the token matching code first, but there will soon be libraries to assist with that task.
 
+Known projects that use this tokenizer library:
+
+* None yet.  Add yours with a pull request!
+
 
 Usage
 -----

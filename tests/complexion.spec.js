@@ -323,11 +323,80 @@
             ]);
         });
     });
+    describe('Adding implicit tokens', function () {
+        var implied, complexion;
 
-    // To test:
-    // defineToken(type, matcher)
-    // tokenize(str) can throw
-    // tokenize(str) returns an array with empty input
-    // tokenize(str) returns an array with tokens
-    // tokenize(str) returns an array of custom token types
+        beforeEach(function () {
+            implied = false;
+            complexion = new Complexion();
+            complexion.defineToken('IMPLIED', function () {
+                if (implied) {
+                    implied = false;
+                    return '';
+                }
+
+                return null;
+            });
+            complexion.defineToken('A', Complexion.matchString('a'));
+            complexion.defineToken('B', Complexion.matchString('b', function (str, offset) {
+                implied = true;
+                return str.charAt(offset);
+            }));
+        });
+        it('adds an implied token immediately', function () {
+            implied = true;
+            expect(complexion.tokenize('a')).toEqual([
+                {
+                    line: 1,
+                    col: 1,
+                    offset: 0,
+                    type: 'IMPLIED',
+                    content: ''
+                },
+                {
+                    line: 1,
+                    col: 1,
+                    offset: 0,
+                    type: 'A',
+                    content: 'a'
+                }
+            ]);
+        });
+        it('adds an implied token in the middle', function () {
+            expect(complexion.tokenize('ba')).toEqual([
+                {
+                    line: 1,
+                    col: 1,
+                    offset: 0,
+                    type: 'B',
+                    content: 'b'
+                },
+                {
+                    line: 1,
+                    col: 2,
+                    offset: 1,
+                    type: 'IMPLIED',
+                    content: ''
+                },
+                {
+                    line: 1,
+                    col: 2,
+                    offset: 1,
+                    type: 'A',
+                    content: 'a'
+                }
+            ]);
+        });
+        it('does not add an implied token at the end', function () {
+            expect(complexion.tokenize('b')).toEqual([
+                {
+                    line: 1,
+                    col: 1,
+                    offset: 0,
+                    type: 'B',
+                    content: 'b'
+                }
+            ]);
+        });
+    });
 }());

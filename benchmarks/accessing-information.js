@@ -7,32 +7,41 @@
 (function () {
     'use strict';
 
-    function passData3(var1, var2) {
+    function TestClass(var1, var2) {
+        this.var1 = var1;
+        this.var2 = var2;
+    }
+
+    TestClass.prototype.passData = function (var1, var2) {
+        this.passData2(var1, var2);
+    };
+
+    TestClass.prototype.passData2 = function (var1, var2) {
+        this.passData3(var1, var2);
+    };
+
+    TestClass.prototype.passData3 = function (var1, var2) {
         return var1 + var2;
-    }
+    };
 
-    function passData2(var1, var2) {
-        return passData3(var1, var2);
-    }
+    TestClass.prototype.viaObject = function () {
+        this.viaObject2();
+    };
 
-    function viaObject3() {
+    TestClass.prototype.viaObject2 = function () {
+        this.viaObject3();
+    };
+
+    TestClass.prototype.viaObject3 = function () {
         return this.var1 + this.var2;
-    }
+    };
 
-    function viaObject2() {
-        return viaObject3();
-    }
-
-    function test(fn) {
+    function test(method) {
         function run(var1, var2) {
             var context;
 
-            context = {
-                var1: var1,
-                var2: var2
-            };
-
-            fn.call(context, var1, var2);
+            context = new TestClass(var1, var2);
+            context[method](var1, var2);
         }
 
         return function () {
@@ -47,12 +56,8 @@
     module.exports = {
         name: "accessing information",
         tests: {
-            'passing data': test(function (var1, var2) {
-                return passData2(var1, var2);
-            }),
-            'via object': test(function () {
-                return viaObject2();
-            })
+            'passing data': test('passData'),
+            'via object': test('viaObject')
         }
     };
 }());

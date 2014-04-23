@@ -59,17 +59,17 @@
                         }
                     });
                     it('passes the normal test', function () {
-                        expect(matcher(haystack, offset)).toBe(result);
+                        expect(matcher(haystack, offset, [])).toBe(result);
                     });
                     it('passes the insensitive test', function () {
-                        expect(matcher(insensitiveHaystack, offset)).toBe(insensitiveResult);
+                        expect(matcher(insensitiveHaystack, offset, [])).toBe(insensitiveResult);
                     });
                     it('chains to the next matcher, which fails', function () {
                         spy.andReturn(null);
-                        expect(matcherWithNext(haystack, offset)).toBe(null);
+                        expect(matcherWithNext(haystack, offset, [])).toBe(null);
 
                         if (result) {
-                            expect(spy).toHaveBeenCalledWith(haystack, offset);
+                            expect(spy).toHaveBeenCalledWith(haystack, offset, []);
                         } else {
                             expect(spy).not.toHaveBeenCalled();
                         }
@@ -78,19 +78,19 @@
                         spy.andReturn("123");
 
                         if (result) {
-                            expect(matcherWithNext(haystack, offset)).toBe("123");
-                            expect(spy).toHaveBeenCalledWith(haystack, offset);
+                            expect(matcherWithNext(haystack, offset, [])).toBe("123");
+                            expect(spy).toHaveBeenCalledWith(haystack, offset, []);
                         } else {
-                            expect(matcherWithNext(haystack, offset)).toBe(null);
+                            expect(matcherWithNext(haystack, offset, [])).toBe(null);
                             expect(spy).not.toHaveBeenCalled();
                         }
                     });
                     it('insensitively chains to the next matcher, which fails', function () {
                         spy.andReturn(null);
-                        expect(matcherWithNext(insensitiveHaystack, offset)).toBe(null);
+                        expect(matcherWithNext(insensitiveHaystack, offset, [])).toBe(null);
 
                         if (insensitiveResult) {
-                            expect(spy).toHaveBeenCalledWith(insensitiveHaystack, offset);
+                            expect(spy).toHaveBeenCalledWith(insensitiveHaystack, offset, []);
                         } else {
                             expect(spy).not.toHaveBeenCalled();
                         }
@@ -99,10 +99,10 @@
                         spy.andReturn("123");
 
                         if (insensitiveResult) {
-                            expect(matcherWithNext(insensitiveHaystack, offset)).toBe("123");
-                            expect(spy).toHaveBeenCalledWith(insensitiveHaystack, offset);
+                            expect(matcherWithNext(insensitiveHaystack, offset, [])).toBe("123");
+                            expect(spy).toHaveBeenCalledWith(insensitiveHaystack, offset, []);
                         } else {
-                            expect(matcherWithNext(insensitiveHaystack, offset)).toBe(null);
+                            expect(matcherWithNext(insensitiveHaystack, offset, [])).toBe(null);
                             expect(spy).not.toHaveBeenCalled();
                         }
                     });
@@ -140,15 +140,18 @@
         });
     });
     describe('Complexion.prototype.tokenize with simple tokens', function () {
-        var complexion;
+        var complexion, wsSpy, wsSpyCalls;
 
         beforeEach(function () {
-            complexion = new Complexion();
-            complexion.defineToken('A', Complexion.matchString('a'));
-            complexion.defineToken('B', Complexion.matchString('b'));
-            complexion.defineToken('WS', function (str, offset) {
+            wsSpyCalls = [];
+            wsSpy = jasmine.createSpy('Whitespace Matcher').andCallFake(function (str, offset, tokenList) {
                 var c, l;
 
+                wsSpyCalls.push([
+                    str,
+                    offset,
+                    tokenList.slice()
+                ]);
                 l = offset;
                 c = str.charAt(offset);
 
@@ -163,9 +166,14 @@
 
                 return str.substr(offset, l - offset);
             });
+            complexion = new Complexion();
+            complexion.defineToken('A', Complexion.matchString('a'));
+            complexion.defineToken('B', Complexion.matchString('b'));
+            complexion.defineToken('WS', wsSpy);
         });
         it('returns an empty array from an empty string', function () {
             expect(complexion.tokenize('')).toEqual([]);
+            expect(wsSpy).not.toHaveBeenCalled();
         });
         it('tokenizes a string of good tokens', function () {
             expect(complexion.tokenize('aabbabab')).toEqual([
@@ -226,6 +234,7 @@
                     content: 'b'
                 }
             ]);
+            expect(wsSpy).not.toHaveBeenCalled();
         });
         it('calculates whitespace correctly', function () {
             expect(complexion.tokenize('a\nb\ra\r\nb\n\ra b\ta')).toEqual([
@@ -320,6 +329,53 @@
                     type: 'A',
                     content: 'a'
                 }
+            ]);
+
+            /* Test that the WS matcher was called a couple times correctly.
+             * It is difficult to test this because the third parameter is
+             * an Array which changes.  The spy simply saves a reference to
+             * the Array object.
+             */
+            expect(wsSpy.callCount).toBe(6);
+            expect(wsSpyCalls[0]).toEqual([
+                "a\nb\ra\r\nb\n\ra b\ta",
+                1,
+                [
+                    {
+                        line: 1,
+                        col: 1,
+                        offset: 0,
+                        type: 'A',
+                        content: 'a'
+                    }
+                ]
+            ]);
+            expect(wsSpyCalls[1]).toEqual([
+                "a\nb\ra\r\nb\n\ra b\ta",
+                3,
+                [
+                    {
+                        line: 1,
+                        col: 1,
+                        offset: 0,
+                        type: 'A',
+                        content: 'a'
+                    },
+                    {
+                        line: 1,
+                        col: 2,
+                        offset: 1,
+                        type: 'WS',
+                        content: '\n'
+                    },
+                    {
+                        line: 2,
+                        col: 1,
+                        offset: 2,
+                        type: 'B',
+                        content: 'b'
+                    }
+                ]
             ]);
         });
     });

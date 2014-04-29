@@ -3,7 +3,7 @@ Complexion
 
 A fast and well tested tokenizer or lexer core.  You can use this library as a scanner to inspect a file and generate a list of tokens.
 
-[![Build Status](https://travis-ci.org/tests-always-included/complexion.svg?branch=master)](https://travis-ci.org/tests-always-included/complexion)
+[![Build Status](https://travis-ci.org/tests-always-included/complexion.svg?branch=master)](https://travis-ci.org/tests-always-included/complexion) [![NPM](https://nodei.co/npm/complexion.png?downloads=true&stars=true)](https://npmjs.org/package/complexion)
 
 
 What Does This Do?

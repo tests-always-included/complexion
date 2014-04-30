@@ -3,7 +3,10 @@ Complexion
 
 A fast and well tested tokenizer or lexer core.  You can use this library as a scanner to inspect a file and generate a list of tokens.
 
-[![Build Status](https://travis-ci.org/tests-always-included/complexion.svg?branch=master)](https://travis-ci.org/tests-always-included/complexion) [![NPM](https://nodei.co/npm/complexion.png?downloads=true&stars=true)](https://npmjs.org/package/complexion)
+[![NPM][npm-image]][NPM]
+[![Build Status][travis-image]][Travis CI]
+[![Dependencies][dependencies-image]][Dependencies]
+[![Dev Dependencies][devdependencies-image]][Dev Dependencies]
 
 
 What Does This Do?
@@ -19,7 +22,7 @@ Known projects that use this tokenizer library:
 Usage
 -----
 
-Install the code using `npm`, `bower` or possibly just clone the repository.  Then, use the library in your JavaScript.  There is UMD markup which should make this library available under any module system that you prefer to use.
+Install the code using `npm`, `bower` or possibly just clone the repository.  Then, use the library in your JavaScript.  There is UMD markup (via [FidUmd]) that should make this library available under any module system that you prefer to use.
 
 Define what the token types are and how to match them.  After this, you are ready to parse things.  Let's take this simple example where I can only parse newlines (CR or LF) and the word "special".
 
@@ -102,3 +105,13 @@ License
 -------
 
 This software is licensed under an [MIT license with an additional non-advertising clause](LICENSE.md).
+
+[Dev Dependencies]: https://david-dm.org/tests-always-included/complexion#info=devDependencies
+[devdependencies-image]: https://david-dm.org/tests-always-included/complexion/dev-status.png
+[Dependencies]: https://david-dm.org/tests-always-included/complexion
+[dependencies-image]: https://david-dm.org/tests-always-included/complexion.png
+[FidUmd]: https://github.com/fidian/fid-umd/
+[NPM]: https://npmjs.org/package/complexion
+[npm-image]: https://nodei.co/npm/complexion.png?downloads=true&stars=true
+[travis-image]: https://secure.travis-ci.org/tests-always-included/complexion.png
+[Travis CI]: http://travis-ci.org/tests-always-included/complexion

@@ -334,7 +334,8 @@
             /* Test that the WS matcher was called a couple times correctly.
              * It is difficult to test this because the third parameter is
              * an Array which changes.  The spy simply saves a reference to
-             * the Array object.
+             * the Array object so we've made the wsSpyCalls array get
+             * populated with copies of the data.
              */
             expect(wsSpy.callCount).toBe(6);
             expect(wsSpyCalls[0]).toEqual([
@@ -451,6 +452,57 @@
                     offset: 0,
                     type: 'B',
                     content: 'b'
+                }
+            ]);
+        });
+    });
+    describe('Custom token types', function () {
+        it('calls our factory and returns the new "tokens"', function () {
+            var complexion, tokenList;
+
+            function factory(tokenData) {
+                tokenList.push(tokenData);
+                return tokenList.length - 1;
+            }
+
+            tokenList = [];
+            complexion = new Complexion(factory);
+            complexion.defineToken('A', Complexion.matchString('a'));
+            complexion.defineToken('B', Complexion.matchString('b'));
+            expect(complexion.tokenize('aaba')).toEqual([
+                0,
+                1,
+                2,
+                3
+            ]);
+            expect(tokenList).toEqual([
+                {
+                    line: 1,
+                    col: 1,
+                    offset: 0,
+                    type: 'A',
+                    content: 'a'
+                },
+                {
+                    line: 1,
+                    col: 2,
+                    offset: 1,
+                    type: 'A',
+                    content: 'a'
+                },
+                {
+                    line: 1,
+                    col: 3,
+                    offset: 2,
+                    type: 'B',
+                    content: 'b'
+                },
+                {
+                    line: 1,
+                    col: 4,
+                    offset: 3,
+                    type: 'A',
+                    content: 'a'
                 }
             ]);
         });

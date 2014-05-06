@@ -113,5 +113,5 @@ This software is licensed under an [MIT license with an additional non-advertisi
 [FidUmd]: https://github.com/fidian/fid-umd/
 [NPM]: https://npmjs.org/package/complexion
 [npm-image]: https://nodei.co/npm/complexion.png?downloads=true&stars=true
-[travis-image]: https://secure.travis-ci.org/tests-always-included/complexion.png
+[travis-image]: https://secure.travis-ci.org/tests-always-included/complexion.png?branch=master
 [Travis CI]: http://travis-ci.org/tests-always-included/complexion

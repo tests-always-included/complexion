@@ -1,6 +1,6 @@
 {
     "name": "complexion",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "A fast tokenizer/lexer core that is well tested.",
     "author": "Tyler Akins <fidian@rumkin.com>",
     "homepage": "https://github.com/tests-always-included/complexion",

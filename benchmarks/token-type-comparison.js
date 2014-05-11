@@ -1,42 +1,60 @@
 /*global module*/
+
 (function () {
     'use strict';
 
-    var targetObject, targetString;
+    var testData;
 
-    function test(arr, fn) {
+    function test(method) {
         return function () {
-            var i;
-
-            for (i = 0; i < arr.length; i += 1) {
-                fn(arr[i]);
-            }
+            testData.forEach(function (dataSet) {
+                return method(dataSet[0], dataSet[1], dataSet[2]);
+            });
         };
     }
 
-    targetObject = {};
-    targetString = 'TESTTOKEN';
+    function AAA() {
+        this.type = AAA;
+        this.typeStr = 'AAA';
+    }
 
+    function BBB() {
+        this.type = BBB;
+        this.typeStr = 'BBB';
+    }
+
+    testData = [
+        [
+            new AAA(),
+            BBB,
+            'BBB'
+        ],
+        [
+            new BBB(),
+            AAA,
+            'AAA'
+        ],
+        [
+            new AAA(),
+            AAA,
+            'AAA'
+        ]
+    ];
+    testData[0][3] = testData[1][0]; // Mismatch
+    testData[1][3] = testData[0][0]; // Mismatch
+    testData[2][3] = testData[2][0]; // Match
     module.exports = {
-        name: "token name comparison",
+        name: "comparing token types",
         tests: {
-            'object comparison': test([
-                {},
-                {},
-                {},
-                {},
-                {}
-            ], function (input) {
-                return input === targetObject;
+            'instanceof': test(function (obj, desiredType) {
+                return obj instanceof desiredType;
             }),
-            'string comparison': test([
-                'WHITESPACE',
-                'SEMICOLON',
-                'COMMENT',
-                'IDENTIFIER',
-                'KEYWORD'
-            ], function (input) {
-                return input === targetString;
+            'object property': test(function (obj, desiredType) {
+                return obj.type === desiredType;
+            }),
+            'string property': test(function (obj, desiredType, string) {
+                /*jslint unparam:true*/
+                return obj.typeStr === string;
             })
         }
     };

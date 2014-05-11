@@ -22,11 +22,11 @@
             expect(c instanceof Complexion).toBe(true);
         });
     });
-    describe('Complexion.matchAny', function () {
+    describe('Complexion.prototype.matchAny', function () {
         var matcher;
 
         beforeEach(function () {
-            matcher = Complexion.matchAny();
+            matcher = Complexion.prototype.matchAny();
         });
         it('returns a character at the beginning', function () {
             expect(matcher('abcd', 0)).toBe('a');
@@ -47,9 +47,9 @@
                     var insensitiveHaystack, insensitiveResult, matcher, matcherWithNext, spy;
 
                     beforeEach(function () {
-                        matcher = Complexion[methodName](needle);
+                        matcher = Complexion.prototype[methodName](needle);
                         spy = jasmine.createSpy('next matcher');
-                        matcherWithNext = Complexion[methodName](needle, spy);
+                        matcherWithNext = Complexion.prototype[methodName](needle, spy);
                         insensitiveHaystack = haystack.toUpperCase();
 
                         if (!isInsensitive || !result) {
@@ -116,7 +116,7 @@
             seeking(null, 'asdfasdf' + needle + 'asdfasdf', 9);
         }
 
-        describe('Complexion.' + methodName, function () {
+        describe('Complexion.prototype.' + methodName, function () {
             addTestToFind("g");
             addTestToFind("kthx");
         });
@@ -167,8 +167,8 @@
                 return str.substr(offset, l - offset);
             });
             complexion = new Complexion();
-            complexion.defineToken('A', Complexion.matchString('a'));
-            complexion.defineToken('B', Complexion.matchString('b'));
+            complexion.defineToken('A', complexion.matchString('a'));
+            complexion.defineToken('B', complexion.matchString('b'));
             complexion.defineToken('WS', wsSpy);
         });
         it('returns an empty array from an empty string', function () {
@@ -394,8 +394,8 @@
 
                 return null;
             });
-            complexion.defineToken('A', Complexion.matchString('a'));
-            complexion.defineToken('B', Complexion.matchString('b', function (str, offset) {
+            complexion.defineToken('A', complexion.matchString('a'));
+            complexion.defineToken('B', complexion.matchString('b', function (str, offset) {
                 implied = true;
                 return str.charAt(offset);
             }));
@@ -466,9 +466,10 @@
             }
 
             tokenList = [];
-            complexion = new Complexion(factory);
-            complexion.defineToken('A', Complexion.matchString('a'));
-            complexion.defineToken('B', Complexion.matchString('b'));
+            complexion = new Complexion();
+            complexion.setTokenFactory(factory);
+            complexion.defineToken('A', complexion.matchString('a'));
+            complexion.defineToken('B', complexion.matchString('b'));
             expect(complexion.tokenize('aaba')).toEqual([
                 0,
                 1,
@@ -504,6 +505,70 @@
                     type: 'A',
                     content: 'a'
                 }
+            ]);
+        });
+    });
+    describe('events', function () {
+        it('fires "start" and "end"', function () {
+            var complexion, eventsFired;
+
+            complexion = new Complexion();
+            eventsFired = [];
+            complexion.on('start', function () {
+                eventsFired.push('start');
+            });
+            complexion.on('end', function () {
+                eventsFired.push('end');
+            });
+            complexion.defineToken('A', complexion.matchString('a'));
+            complexion.tokenize('a');
+            expect(eventsFired).toEqual([
+                'start',
+                'end'
+            ]);
+        });
+        it('can remove events with removal function', function () {
+            var complexion, eventsFired, removalFunction;
+
+            complexion = new Complexion();
+            eventsFired = [];
+            removalFunction = complexion.on('start', function () {
+                eventsFired.push('start');
+            });
+            complexion.on('end', function () {
+                eventsFired.push('end');
+            });
+            complexion.defineToken('A', complexion.matchString('a'));
+            complexion.tokenize('a');
+            removalFunction();
+            complexion.tokenize('a');
+            expect(eventsFired).toEqual([
+                'start',
+                'end',
+                'end'
+            ]);
+        });
+        it('can remove events with "off"', function () {
+            var complexion, eventsFired;
+
+            function logEnd() {
+                eventsFired.push('end');
+            }
+
+            complexion = new Complexion();
+            eventsFired = [];
+            complexion.on('start', function () {
+                eventsFired.push('start');
+            });
+            complexion.on('end', logEnd);
+            complexion.defineToken('A', complexion.matchString('a'));
+            complexion.tokenize('a');
+            complexion.off('end', logEnd);
+            complexion.tokenize('a');
+            expect(eventsFired).toEqual([
+                'start',
+                'end',
+                'start'
             ]);
         });
     });

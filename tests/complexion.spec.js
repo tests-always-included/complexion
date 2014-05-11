@@ -508,4 +508,68 @@
             ]);
         });
     });
+    describe('events', function () {
+        it('fires "start" and "end"', function () {
+            var complexion, eventsFired;
+
+            complexion = new Complexion();
+            eventsFired = [];
+            complexion.on('start', function () {
+                eventsFired.push('start');
+            });
+            complexion.on('end', function () {
+                eventsFired.push('end');
+            });
+            complexion.defineToken('A', complexion.matchString('a'));
+            complexion.tokenize('a');
+            expect(eventsFired).toEqual([
+                'start',
+                'end'
+            ]);
+        });
+        it('can remove events with removal function', function () {
+            var complexion, eventsFired, removalFunction;
+
+            complexion = new Complexion();
+            eventsFired = [];
+            removalFunction = complexion.on('start', function () {
+                eventsFired.push('start');
+            });
+            complexion.on('end', function () {
+                eventsFired.push('end');
+            });
+            complexion.defineToken('A', complexion.matchString('a'));
+            complexion.tokenize('a');
+            removalFunction();
+            complexion.tokenize('a');
+            expect(eventsFired).toEqual([
+                'start',
+                'end',
+                'end'
+            ]);
+        });
+        it('can remove events with "off"', function () {
+            var complexion, eventsFired;
+
+            function logEnd() {
+                eventsFired.push('end');
+            }
+
+            complexion = new Complexion();
+            eventsFired = [];
+            complexion.on('start', function () {
+                eventsFired.push('start');
+            });
+            complexion.on('end', logEnd);
+            complexion.defineToken('A', complexion.matchString('a'));
+            complexion.tokenize('a');
+            complexion.off('end', logEnd);
+            complexion.tokenize('a');
+            expect(eventsFired).toEqual([
+                'start',
+                'end',
+                'start'
+            ]);
+        });
+    });
 }());

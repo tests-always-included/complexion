@@ -3,9 +3,37 @@
 (function () {
     'use strict';
 
-    var pattern;
+    var hash, pattern;
 
+    hash = {
+        a: true,
+        b: true,
+        c: true,
+        d: true,
+        e: true,
+        f: true,
+        A: true,
+        B: true,
+        C: true,
+        D: true,
+        E: true,
+        F: true,
+        0: true,
+        1: true,
+        2: true,
+        3: true,
+        4: true,
+        5: true,
+        6: true,
+        7: true,
+        8: true,
+        9: true
+    };
     pattern = /^[A-Za-z0-9]{4}/;
+
+    function inHash(c) {
+        return hash[c];
+    }
 
     function isHex(c) {
         return ((c >= 'A' && c <= 'F') || (c <= 'a' && c >= 'f') || (c >= '0' && c <= '9'));
@@ -42,6 +70,10 @@
             'characters': test(function (str) {
                 // Function that just returns true/false
                 return isHex(str.charAt(0)) && isHex(str.charAt(1)) && isHex(str.charAt(2)) && isHex(str.charAt(3));
+            }),
+            'characters as hash': test(function (str) {
+                // Function that just returns true/false
+                return inHash(str.charAt(0)) && inHash(str.charAt(1)) && inHash(str.charAt(2)) && inHash(str.charAt(3));
             }),
             'matchHex': test(function (str) {
                 // Matcher function like what the tokenizer does

@@ -28,9 +28,9 @@ Define what the token types are and how to match them.  After this, you are read
 
     var Complexion = require('complexion');
     var instance = new Complexion();
-    instance.defineToken('CR', Complexion.matchString('\r'));
-    instance.defineToken('LF', Complexion.matchString('\n'));
-    instance.defineToken('SPECIAL', Complexion.matchStringInsensitive('special'));
+    instance.defineToken('CR', instance.matchString('\r'));
+    instance.defineToken('LF', instance.matchString('\n'));
+    instance.defineToken('SPECIAL', instance.matchStringInsensitive('special'));
     var result = instance.tokenize("special\n\nSpecial\n");
     // result is now an array of 5 token objects.  The tokens, in order are:
     // SPECIAL CR CR SPECIAL CR
@@ -61,22 +61,22 @@ A "matcher" is what is used to see if the upcoming text matches what's expected 
         return null;
     }
 
-To help simplify the process of tokenization, a few matcher factories are exposed on the `Complexion` object itself.
+To help simplify the process of tokenization, a few matcher factories are exposed on instances of `Complexion`.
 
-### Complexion.matchAny()
+### complexion.prototype.matchAny()
 
 Will match any character.  Useful if you want to make an "UNKNOWN" token so tokenization won't ever throw during parsing.
 
-    instance.defineToken('UNKNOWN', Complexion.matchAny());
+    instance.defineToken('UNKNOWN', instance.matchAny());
 
-### Complexion.matchString(str, [nextMatcher])
+### complexion.prototype.matchString(str, [nextMatcher])
 
 Matches a string.  Care has been taken to ensure this generates as fast of a matching function as is possible.  If you want to use this as a filter or conditionally create tokens that match a string, you can pass in a `nextMatcher` which will only get called if `str` matches first.
 
     // CSS "!important" - there may be whitespace between the '!' and 'important'
-    var matchImportant = Complexion.matchStringInsensitive('important');
+    var matchImportant = instance.matchStringInsensitive('important');
 
-    instance.defineToken('IMPORTANT', Complexion.matchString('!', function (str, offset) {
+    instance.defineToken('IMPORTANT', instance.matchString('!', function (str, offset) {
         var imp, ws;
         ws = whitespaceMatcher(str, offset + 1) || '';  // Compensate for "!"
         imp = matchImportant(str, offset + 1 + ws.length);
@@ -88,9 +88,9 @@ Matches a string.  Care has been taken to ensure this generates as fast of a mat
         return null;
     });
 
-### Complexion.matchStringInsensitive(str, [nextMatcher])
+### complexion.prototype.matchStringInsensitive(str, [nextMatcher])
 
-Identical to `Complexion.matchString()` except this is the case insensitive version.
+Identical to `complexion.prototype.matchString()` except this is the case insensitive version.
 
 
 Development

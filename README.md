@@ -3,10 +3,10 @@ Complexion
 
 A fast and well tested tokenizer or lexer core.  You can use this library as a scanner to inspect a file and generate a list of tokens.
 
-[![NPM][npm-image]][NPM]
-[![Build Status][travis-image]][Travis CI]
-[![Dependencies][dependencies-image]][Dependencies]
-[![Dev Dependencies][devdependencies-image]][Dev Dependencies]
+[![npm version][npm-badge]][npm-link]
+[![Build Status][travis-badge]][travis-link]
+[![Dependencies][dependencies-badge]][dependencies-link]
+[![Dev Dependencies][devdependencies-badge]][devdependencies-link]
 
 
 What Does This Do?
@@ -106,12 +106,12 @@ License
 
 This software is licensed under an [MIT license with an additional non-advertising clause](LICENSE.md).
 
-[Dev Dependencies]: https://david-dm.org/tests-always-included/complexion#info=devDependencies
-[devdependencies-image]: https://david-dm.org/tests-always-included/complexion/dev-status.png
-[Dependencies]: https://david-dm.org/tests-always-included/complexion
-[dependencies-image]: https://david-dm.org/tests-always-included/complexion.png
+[dependencies-badge]: https://img.shields.io/david/tests-always-included/complexion.svg
+[dependencies-link]: https://david-dm.org/tests-always-included/complexion
+[devdependencies-badge]: https://img.shields.io/david/dev/tests-always-included/complexion.svg
+[devdependencies-link]: https://david-dm.org/tests-always-included/complexion#info=devDependencies
 [FidUmd]: https://github.com/fidian/fid-umd/
-[NPM]: https://npmjs.org/package/complexion
-[npm-image]: https://nodei.co/npm/complexion.png?downloads=true&stars=true
-[travis-image]: https://secure.travis-ci.org/tests-always-included/complexion.png
-[Travis CI]: http://travis-ci.org/tests-always-included/complexion
+[npm-badge]: https://img.shields.io/npm/v/complexion.svg
+[npm-link]: https://npmjs.org/package/complexion
+[travis-badge]: https://img.shields.io/travis/tests-always-included/complexion/master.svg
+[travis-link]: http://travis-ci.org/tests-always-included/complexion

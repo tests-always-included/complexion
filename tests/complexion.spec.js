@@ -509,16 +509,28 @@
         });
     });
     describe('events', function () {
-        it('fires "start" and "end"', function () {
+        it('emits "start" and "end" with data', function () {
             var complexion, eventsFired;
 
             complexion = new Complexion();
             eventsFired = [];
-            complexion.on('start', function () {
+            complexion.on('start', function (data) {
                 eventsFired.push('start');
+                expect(data).toEqual({});
             });
-            complexion.on('end', function () {
+            complexion.on('end', function (data) {
                 eventsFired.push('end');
+                expect(data).toEqual({
+                    tokenList: [
+                        {
+                            line: 1,
+                            col: 1,
+                            content: 'a',
+                            offset: 0,
+                            type: 'A'
+                        }
+                    ]
+                });
             });
             complexion.defineToken('A', complexion.matchString('a'));
             complexion.tokenize('a');

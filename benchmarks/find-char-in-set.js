@@ -11,9 +11,14 @@
         };
     }
 
-    var letters;
+    var hash, i, letters;
 
+    hash = {};
     letters = 'abcdefghijklmnopqrstuvwxyz';
+
+    for (i = 0; i < letters.length; i += 1) {
+        hash[letters.charAt(0)] = true;
+    }
 
     module.exports = {
         name: "find if a character is in a set",
@@ -31,6 +36,9 @@
             }),
             '>= a and <= z': test(function (c) {
                 return c >= 'a' && c <= 'z';
+            }),
+            'hash': test(function (c) {
+                return hash[c];
             })
         }
     };

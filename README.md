@@ -3,10 +3,10 @@ Complexion
 
 A fast and well tested tokenizer or lexer core.  You can use this library as a scanner to inspect a file and generate a list of tokens.
 
-[![NPM][npm-image]][NPM]
-[![Build Status][travis-image]][Travis CI]
-[![Dependencies][dependencies-image]][Dependencies]
-[![Dev Dependencies][devdependencies-image]][Dev Dependencies]
+[![npm version][npm-badge]][npm-link]
+[![Build Status][travis-badge]][travis-link]
+[![Dependencies][dependencies-badge]][dependencies-link]
+[![Dev Dependencies][devdependencies-badge]][devdependencies-link]
 
 
 What Does This Do?
@@ -28,9 +28,9 @@ Define what the token types are and how to match them.  After this, you are read
 
     var Complexion = require('complexion');
     var instance = new Complexion();
-    instance.defineToken('CR', Complexion.matchString('\r'));
-    instance.defineToken('LF', Complexion.matchString('\n'));
-    instance.defineToken('SPECIAL', Complexion.matchStringInsensitive('special'));
+    instance.defineToken('CR', instance.matchString('\r'));
+    instance.defineToken('LF', instance.matchString('\n'));
+    instance.defineToken('SPECIAL', instance.matchStringInsensitive('special'));
     var result = instance.tokenize("special\n\nSpecial\n");
     // result is now an array of 5 token objects.  The tokens, in order are:
     // SPECIAL CR CR SPECIAL CR
@@ -61,22 +61,22 @@ A "matcher" is what is used to see if the upcoming text matches what's expected 
         return null;
     }
 
-To help simplify the process of tokenization, a few matcher factories are exposed on the `Complexion` object itself.
+To help simplify the process of tokenization, a few matcher factories are exposed on instances of `Complexion`.
 
-### Complexion.matchAny()
+### complexion.prototype.matchAny()
 
 Will match any character.  Useful if you want to make an "UNKNOWN" token so tokenization won't ever throw during parsing.
 
-    instance.defineToken('UNKNOWN', Complexion.matchAny());
+    instance.defineToken('UNKNOWN', instance.matchAny());
 
-### Complexion.matchString(str, [nextMatcher])
+### complexion.prototype.matchString(str, [nextMatcher])
 
 Matches a string.  Care has been taken to ensure this generates as fast of a matching function as is possible.  If you want to use this as a filter or conditionally create tokens that match a string, you can pass in a `nextMatcher` which will only get called if `str` matches first.
 
     // CSS "!important" - there may be whitespace between the '!' and 'important'
-    var matchImportant = Complexion.matchStringInsensitive('important');
+    var matchImportant = instance.matchStringInsensitive('important');
 
-    instance.defineToken('IMPORTANT', Complexion.matchString('!', function (str, offset) {
+    instance.defineToken('IMPORTANT', instance.matchString('!', function (str, offset) {
         var imp, ws;
         ws = whitespaceMatcher(str, offset + 1) || '';  // Compensate for "!"
         imp = matchImportant(str, offset + 1 + ws.length);
@@ -88,9 +88,9 @@ Matches a string.  Care has been taken to ensure this generates as fast of a mat
         return null;
     });
 
-### Complexion.matchStringInsensitive(str, [nextMatcher])
+### complexion.prototype.matchStringInsensitive(str, [nextMatcher])
 
-Identical to `Complexion.matchString()` except this is the case insensitive version.
+Identical to `complexion.prototype.matchString()` except this is the case insensitive version.
 
 
 Development
@@ -98,7 +98,7 @@ Development
 
 If you want to work on this library, you need to check out the repository and run `npm install` to get the dependencies.
 
-Tests are *always* included.  Make sure tests cover your changes.  To run the current tests, just use `npm test` or `grunt test` (they will run the same test sute).
+Tests are *always* included.  Make sure tests cover your changes.  To run the current tests, just use `npm test` or `grunt test` (they will run the same test suite).
 
 
 License
@@ -106,12 +106,12 @@ License
 
 This software is licensed under an [MIT license with an additional non-advertising clause](LICENSE.md).
 
-[Dev Dependencies]: https://david-dm.org/tests-always-included/complexion#info=devDependencies
-[devdependencies-image]: https://david-dm.org/tests-always-included/complexion/dev-status.png
-[Dependencies]: https://david-dm.org/tests-always-included/complexion
-[dependencies-image]: https://david-dm.org/tests-always-included/complexion.png
+[dependencies-badge]: https://img.shields.io/david/tests-always-included/complexion.svg
+[dependencies-link]: https://david-dm.org/tests-always-included/complexion
+[devdependencies-badge]: https://img.shields.io/david/dev/tests-always-included/complexion.svg
+[devdependencies-link]: https://david-dm.org/tests-always-included/complexion#info=devDependencies
 [FidUmd]: https://github.com/fidian/fid-umd/
-[NPM]: https://npmjs.org/package/complexion
-[npm-image]: https://nodei.co/npm/complexion.png?downloads=true&stars=true
-[travis-image]: https://secure.travis-ci.org/tests-always-included/complexion.png?branch=master
-[Travis CI]: http://travis-ci.org/tests-always-included/complexion
+[npm-badge]: https://img.shields.io/npm/v/complexion.svg
+[npm-link]: https://npmjs.org/package/complexion
+[travis-badge]: https://img.shields.io/travis/tests-always-included/complexion/master.svg
+[travis-link]: http://travis-ci.org/tests-always-included/complexion

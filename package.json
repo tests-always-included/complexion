@@ -1,6 +1,6 @@
 {
     "name": "complexion",
-    "version": "0.1.3",
+    "version": "0.2.0",
     "description": "A fast tokenizer/lexer core that is well tested.",
     "author": "Tyler Akins <fidian@rumkin.com>",
     "homepage": "https://github.com/tests-always-included/complexion",
@@ -27,16 +27,13 @@
         "fast"
     ],
     "devDependencies": {
-        "fid-umd": "*",
-        "grunt": "~0.4.1",
-        "grunt-benchmark": "*",
-        "grunt-cli": "*",
-        "grunt-jasmine-node": "*",
-        "grunt-jslint": "*"
+        "eslint": "^4.3.0",
+        "fid-umd": "^2.0.5",
+        "jasmine": "^2.6.0"
     },
     "license": "MIT",
     "scripts": {
-        "test": "grunt test",
+        "test": "jasmine && eslint .",
         "umd": "fid-umd lib/*.js"
     }
 }

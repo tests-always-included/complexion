@@ -1,20 +1,22 @@
-/*global module*/
-(function () {
-    'use strict';
+"use strict";
 
-    function myCallback() {
-        return undefined;
-    }
+/**
+ * Test function
+ *
+ * @return {undefined}
+ */
+function myCallback() {
+    return undefined; // eslint-disable-line no-undefined
+}
 
-    module.exports = {
-        name: "calling a function",
-        tests: {
-            'direct': function () {
-                myCallback();
-            },
-            'call': function () {
-                myCallback.call();
-            }
+module.exports = {
+    name: "calling a function",
+    tests: {
+        direct: function () {
+            myCallback();
+        },
+        call: function () {
+            myCallback.call();
         }
-    };
-}());
+    }
+};

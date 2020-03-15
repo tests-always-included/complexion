@@ -27,7 +27,7 @@
         "fast"
     ],
     "devDependencies": {
-        "eslint": "^6.6.0",
+        "eslint": "^6.8.0",
         "fid-umd": "^2.0.5",
         "jasmine": "^3.5.0"
     },
